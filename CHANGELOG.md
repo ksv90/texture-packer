@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/ksv90/texture-packer/compare/v0.0.2...v0.0.3) (2024-03-26)
+
+
+### Bug Fixes
+
+* pack one method ([03d0bed](https://github.com/ksv90/texture-packer/commit/03d0bedbdc69a86607836f07e92efb54bb6edb74))
+
 ## [0.0.2](https://github.com/ksv90/texture-packer/compare/v0.0.1...v0.0.2) (2024-03-26)
 
 

@@ -17,6 +17,7 @@
     "build": "rollup --config rollup.config.ts --configPlugin typescript",
     "lint": "eslint .",
     "format": "prettier --write .",
+    "test": "echo test",
     "texture-pack": "pnpm tsx ./examples/texture-pack.ts"
   },
   "dependencies": {

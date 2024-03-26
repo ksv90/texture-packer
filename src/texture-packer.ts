@@ -66,6 +66,24 @@ export class TexturePacker {
     await Promise.all(series);
   }
 
+  public async packOne(directory: string, options: SpriteDataOptions): Promise<void> {
+    const { addSrcPath } = this.options;
+    const { width, height, scale = 1 } = options;
+    const currentSrc = path.join(this.inputPath, directory, addSrcPath ? Directories.src : '');
+    let textureDataList = await makeTextureDataList(currentSrc);
+
+    if (this.prePackTextureDataHook) {
+      textureDataList = await Promise.all(textureDataList.map(this.prePackTextureDataHook));
+    }
+
+    if (scale !== 1) {
+      textureDataList = await Promise.all(textureDataList.map((textureData) => resizeTextures(scale, textureData)));
+    }
+    const spriteDataList = await createSpriteDataList(textureDataList, { width, height, scale });
+    const filesDataList = await this.createFilesDataList(spriteDataList);
+    await this.saveFiles(path.join(this.outputPath, directory), scale.toFixed(1), filesDataList);
+  }
+
   protected async createFilesDataList(spriteDataList: ReadonlyArray<SpriteData>): Promise<Array<OutputFileData>> {
     const { spritesheetName } = this.options;
     const series = spriteDataList.map(async (spriteData, index, { length }) => {

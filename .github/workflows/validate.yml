@@ -1,0 +1,32 @@
+name: Validate
+
+on:
+  pull_request:
+
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  changes-check:
+    runs-on: ubuntu-latest
+    outputs:
+      src: ${{ steps.changes-check.outputs.changes.src }}
+      deps: ${{ steps.changes-check.outputs.changes.deps }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: changes-check
+        with:
+          filters: |
+            src:
+              - 'src/**'
+            deps:
+              - 'pnpm-lock.yaml'
+  validate:
+    needs: changes-check
+    if: ${{ needs.changes-check.outputs.src == 'true' || needs.changes-check.outputs.deps == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/install
+      - run: pnpm lint

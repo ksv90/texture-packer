@@ -1,0 +1,52 @@
+{
+  "name": "@ksv90/texture-packer",
+  "version": "0.0.1",
+  "description": "texture-packer",
+  "author": "ksv90",
+  "license": "ISC",
+  "keywords": [
+    "texture-packer"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "./dist"
+  ],
+  "scripts": {
+    "build": "rollup --config rollup.config.ts --configPlugin typescript",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "texture-pack": "pnpm tsx ./examples/texture-pack.ts"
+  },
+  "dependencies": {
+    "buffer-image-size": "^0.6.4",
+    "maxrects-packer": "^2.7.3",
+    "sharp": "^0.33.3"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/node": "^20.11.30",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-simple-import-sort": "^12.0.0",
+    "pixi.js": "^8.0.4",
+    "prettier": "^3.2.5",
+    "rollup": "^4.13.0",
+    "tslib": "^2.6.2",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.3"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.11.0",
+  "homepage": "https://github.com/ksv90/texture-packer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ksv90/texture-packer.git"
+  }
+}

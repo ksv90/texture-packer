@@ -1,0 +1,7 @@
+node_modules/
+dist/
+bin/
+examples/packed-textures/
+examples/public/
+.vscode
+.DS_Store

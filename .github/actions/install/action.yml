@@ -1,0 +1,38 @@
+name: Install pnpm
+description: Install dependencies and pnpm cache
+
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v3
+      with:
+        standalone: true
+        run_install: false
+        dest: ~/.pnpm
+
+    - name: Cache pnpm-home
+      uses: actions/cache@v3
+      id: pnpm-home
+      with:
+        path: ${{ env.PNPM_HOME }}
+        key: pnpm-home-${{ hashFiles('.npmrc') }}
+
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      id: node-modules
+      with:
+        path: node_modules
+        key: node-modules-${{ hashFiles('pnpm-lock.yaml') }}
+
+    - name: Set github config
+      run: pnpm config set '//npm.pkg.github.com/:_authToken' "${NODE_AUTH_TOKEN}"
+      shell: bash
+
+    - name: Set npm config
+      run: pnpm config set '//registry.npmjs.org/:_authToken' "${NPM_TOKEN}"
+      shell: bash
+
+    - name: Install dependencies
+      if: steps.node-modules.cache-hit != 'true'
+      run: pnpm install --frozen-lockfile
+      shell: bash

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/ksv90/texture-packer/compare/v0.0.3...v0.0.4) (2024-03-27)
+
+
+### Bug Fixes
+
+* tsconfig changed ([782115e](https://github.com/ksv90/texture-packer/commit/782115e6693a4366b6e94b5e0bcc99efcbcd73f3))
+
 ## [0.0.3](https://github.com/ksv90/texture-packer/compare/v0.0.2...v0.0.3) (2024-03-26)
 
 

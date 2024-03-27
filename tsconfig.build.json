@@ -3,7 +3,7 @@
   "include": ["src"],
   "compilerOptions": {
     "rootDir": "src",
-    "declaration": true,
-    "declarationMap": true
+    "sourceMap": true,
+    "inlineSources": true
   }
 }

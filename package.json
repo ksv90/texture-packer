@@ -9,7 +9,7 @@
   ],
   "type": "module",
   "main": "dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "files": [
     "./dist"
   ],
@@ -37,6 +37,7 @@
     "pixi.js": "^8.0.4",
     "prettier": "^3.2.5",
     "rollup": "^4.13.0",
+    "rollup-plugin-flat-dts": "^2.6.0",
     "tslib": "^2.6.2",
     "tsx": "^4.7.1",
     "typescript": "^5.4.3"

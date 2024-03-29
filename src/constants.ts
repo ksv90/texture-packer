@@ -24,6 +24,9 @@ export const LOW_QUALITY_SIZE = 1024;
 export const MEDIUM_QUALITY_SIZE = 2048;
 export const HIGH_QUALITY_SIZE = 4096;
 
-export const LOW_SIZES = { width: LOW_QUALITY_SIZE, height: LOW_QUALITY_SIZE };
-export const MEDIUM_SIZES = { width: MEDIUM_QUALITY_SIZE, height: MEDIUM_QUALITY_SIZE };
-export const HIGH_SIZES = { width: HIGH_QUALITY_SIZE, height: HIGH_QUALITY_SIZE };
+export const LOW_SIZE = { width: LOW_QUALITY_SIZE, height: LOW_QUALITY_SIZE };
+export const MEDIUM_SIZE = { width: MEDIUM_QUALITY_SIZE, height: MEDIUM_QUALITY_SIZE };
+export const HIGH_SIZE = { width: HIGH_QUALITY_SIZE, height: HIGH_QUALITY_SIZE };
+
+export const DESKTOP_CATEGORY = 'desktop';
+export const MOBILE_CATEGORY = 'mobile';

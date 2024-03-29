@@ -40,7 +40,7 @@ export async function resizeTexture(sourceTextureData: SourceTextureData, scale 
 }
 
 export async function trimTexture(textureData: TextureData): Promise<TextureData> {
-  const { data, info } = await sharp(textureData.buffer).trim({}).toBuffer({ resolveWithObject: true });
+  const { data, info } = await sharp(textureData.buffer).trim().toBuffer({ resolveWithObject: true });
   if (!info.trimOffsetLeft || !info.trimOffsetTop) return textureData;
   return {
     ...textureData,

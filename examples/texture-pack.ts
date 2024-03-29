@@ -1,6 +1,14 @@
 import path from 'node:path';
 
-import { HIGH_SIZES, LOW_SIZES, MEDIUM_SIZES, resizeTexture, TexturePacker } from '../src';
+import {
+  DESKTOP_CATEGORY,
+  HIGH_SIZE,
+  LOW_SIZE,
+  MEDIUM_SIZE,
+  MOBILE_CATEGORY,
+  resizeTexture,
+  TexturePacker,
+} from '../src';
 
 export const INPUT_DIR_NAME = 'examples/public';
 export const OUTPUT_DIR_NAME = 'examples/packed-textures';
@@ -16,9 +24,9 @@ void (await (async function main() {
     const scale = basename.endsWith('_blur') ? 0.25 : 0.5;
     return resizeTexture(sourceTextureData, scale);
   };
-  await texturePacker.packTextures({ ...MEDIUM_SIZES, category: 'desktop' });
-  await texturePacker.packTextures({ ...HIGH_SIZES, scale: 2, category: 'desktop' });
-  await texturePacker.packTextures({ ...MEDIUM_SIZES, scale: 2, category: 'mobile' });
-  await texturePacker.packOne('symbols', { ...LOW_SIZES });
-  await texturePacker.packOne('symbols', { ...MEDIUM_SIZES, scale: 2 });
+  await texturePacker.packTextures({ ...MEDIUM_SIZE, category: DESKTOP_CATEGORY });
+  await texturePacker.packTextures({ ...HIGH_SIZE, scale: 2, category: DESKTOP_CATEGORY });
+  await texturePacker.packTextures({ ...MEDIUM_SIZE, scale: 2, category: MOBILE_CATEGORY });
+  await texturePacker.packOne('symbols', { ...LOW_SIZE });
+  await texturePacker.packOne('symbols', { ...MEDIUM_SIZE, scale: 2 });
 })());

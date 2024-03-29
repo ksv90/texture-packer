@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.0](https://github.com/ksv90/texture-packer/compare/v0.0.4...v0.1.0) (2024-03-29)
+
+
+### Features
+
+* texture trim added ([e8cf9a6](https://github.com/ksv90/texture-packer/commit/e8cf9a6c2631c251dc355f7b88ec3077c93bb448))
+
+
+### Bug Fixes
+
+* constants added ([ef18a55](https://github.com/ksv90/texture-packer/commit/ef18a55c09abed6fce9dd0be2ff23113ea95bd53))
+
 ## [0.0.4](https://github.com/ksv90/texture-packer/compare/v0.0.3...v0.0.4) (2024-03-27)
 
 

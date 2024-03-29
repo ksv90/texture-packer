@@ -1,25 +1,32 @@
-import { mkdir, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+
+import { Bin, MaxRectsPacker } from 'maxrects-packer';
 
 import { DEFAULT_SPRITESHEETS_NAME, Directories, Ext } from './constants';
 import {
   createOverlayOptions,
-  createSpriteDataList,
   createSpriteFactory,
   createSpritesheetsData,
   createSpritesheetsFrames,
   getChildDirectories,
-  makeTextureDataList,
-  resizeTextures,
+  makeTextureData,
 } from './helpers';
-import { OutputFileData, SpriteData, SpriteDataOptions, TextureData, TexturePackerOptions } from './types';
-import { createBufferFromData } from './utils';
+import {
+  OutputFileData,
+  PreSourceTextureDataHook,
+  SpriteData,
+  SpriteDataOptions,
+  TextureData,
+  TexturePackerOptions,
+} from './types';
+import { createBufferFromData, rotateTexture } from './utils';
 
 export class TexturePacker {
   protected options: TexturePackerOptions;
 
-  public prePackTextureDataHook?: (textureData: TextureData) => TextureData | Promise<TextureData>;
+  public preSourceTextureDataHook?: PreSourceTextureDataHook;
 
   constructor(
     protected readonly inputPath: string,
@@ -28,60 +35,73 @@ export class TexturePacker {
   ) {
     this.options = {
       spritesheetName: options.spritesheetName ?? DEFAULT_SPRITESHEETS_NAME,
-      excludePaths: options.excludePaths ?? [],
-      addSrcPath: options.addSrcPath,
+      excludePaths: options.excludePaths,
+      subDir: options.subDir,
     };
   }
 
-  public async packTextures(deviceCategory: string, options: SpriteDataOptions): Promise<void> {
-    const { addSrcPath, excludePaths } = this.options;
-    const { width, height, scale = 1 } = options;
+  public async packTextures(options: SpriteDataOptions): Promise<void> {
+    const { excludePaths = [] } = this.options;
     const childDirectories = await getChildDirectories(this.inputPath);
-
     const series = childDirectories
       .filter((directoryPath) => !excludePaths.includes(directoryPath))
       .map(async (directory) => {
-        const currentSrc = path.join(this.inputPath, directory, deviceCategory, addSrcPath ? Directories.src : '');
-        try {
-          await stat(currentSrc);
-        } catch (err) {
-          process.stdin.write(`в директории ${directory} нет каталога ${deviceCategory} или доступ к нему запрещен\n`);
-          return;
-        }
-
-        let textureDataList = await makeTextureDataList(currentSrc);
-
-        if (this.prePackTextureDataHook) {
-          textureDataList = await Promise.all(textureDataList.map(this.prePackTextureDataHook));
-        }
-
-        if (scale !== 1) {
-          textureDataList = await Promise.all(textureDataList.map((textureData) => resizeTextures(scale, textureData)));
-        }
-
-        const spriteDataList = await createSpriteDataList(textureDataList, { width, height, scale });
-        const filesDataList = await this.createFilesDataList(spriteDataList);
-        await this.saveFiles(path.join(this.outputPath, directory, deviceCategory), scale.toFixed(1), filesDataList);
+        await this.packOne(directory, options);
       });
     await Promise.all(series);
   }
 
   public async packOne(directory: string, options: SpriteDataOptions): Promise<void> {
-    const { addSrcPath } = this.options;
-    const { width, height, scale = 1 } = options;
-    const currentSrc = path.join(this.inputPath, directory, addSrcPath ? Directories.src : '');
-    let textureDataList = await makeTextureDataList(currentSrc);
-
-    if (this.prePackTextureDataHook) {
-      textureDataList = await Promise.all(textureDataList.map(this.prePackTextureDataHook));
+    const { subDir = '' } = this.options;
+    const { width, height, scale = 1, category = '' } = options;
+    const currentPath = path.join(this.inputPath, directory, category, subDir);
+    try {
+      await stat(currentPath);
+    } catch (error) {
+      const message = `в директории ${directory} нет каталога ${category} или доступ к нему запрещен\n${String(error)}\n`;
+      process.stdin.write(message);
+      return;
     }
-
-    if (scale !== 1) {
-      textureDataList = await Promise.all(textureDataList.map((textureData) => resizeTextures(scale, textureData)));
-    }
-    const spriteDataList = await createSpriteDataList(textureDataList, { width, height, scale });
+    const textureDataList = await this.makeTextureDataList(currentPath, scale);
+    const maxRectsPacker = new MaxRectsPacker<TextureData>(width, height, 1, { allowRotation: true });
+    maxRectsPacker.addArray(textureDataList);
+    const spriteDataList = await this.createSpriteDataList(maxRectsPacker.bins, scale);
     const filesDataList = await this.createFilesDataList(spriteDataList);
-    await this.saveFiles(path.join(this.outputPath, directory), scale.toFixed(1), filesDataList);
+    await this.saveFiles(path.join(this.outputPath, directory, category), scale.toFixed(1), filesDataList);
+  }
+
+  protected async makeTextureDataList(absoluteDirectoryPath: string, scale: number): Promise<Array<TextureData>> {
+    const items = await readdir(absoluteDirectoryPath);
+
+    const dataListPromises = items.map(async (itemPath) => {
+      const currentPath = path.join(absoluteDirectoryPath, itemPath);
+      try {
+        const stats = await stat(currentPath);
+        if (stats.isDirectory()) throw `невозможно прочитать файл, ${currentPath} является директорией`;
+        return makeTextureData(currentPath, scale, this.preSourceTextureDataHook);
+      } catch (error) {
+        const message = `${this.makeTextureDataList.name} warn: не удалось получить данные ${currentPath}\n${String(error)}\n\n`;
+        process.stdin.write(message);
+        return null;
+      }
+    });
+    const dataList = await Promise.all(dataListPromises);
+    return dataList.filter((data): data is TextureData => !!data);
+  }
+
+  protected async createSpriteDataList(
+    textureDataInfo: Array<Bin<TextureData>>,
+    scale: number,
+  ): Promise<Array<SpriteData>> {
+    const spriteDataPromises = textureDataInfo.map(async ({ width, height, rects }) => {
+      const textureDataPromises = rects.map(async (textureData) => {
+        if (!textureData.rot) return textureData;
+        return await rotateTexture(textureData);
+      });
+      const textureDataList = await Promise.all(textureDataPromises);
+      return { width, height, textureDataList, scale } satisfies SpriteData;
+    });
+    return await Promise.all(spriteDataPromises);
   }
 
   protected async createFilesDataList(spriteDataList: ReadonlyArray<SpriteData>): Promise<Array<OutputFileData>> {

@@ -9,5 +9,6 @@ export default defineConfig([
     input: 'src/index.ts',
     output: { file: 'dist/index.js', format: 'es', sourcemap: true },
     plugins: [typescript({ tsconfig }), flatDts({ tsconfig, compilerOptions: { declarationMap: true } })],
+    external: ['buffer-image-size', 'maxrects-packer', 'sharp'],
   },
 ]);

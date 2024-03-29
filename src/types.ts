@@ -1,11 +1,24 @@
-export type TextureData = {
+export type SourceTextureData = {
   readonly name: string;
+  readonly type: string;
   readonly buffer: globalThis.Buffer;
   readonly width: number;
   readonly height: number;
+};
+
+export type TextureData = {
+  readonly name: string;
+  readonly buffer: globalThis.Buffer;
+  readonly sourceWidth: number;
+  readonly sourceHeight: number;
   readonly x: number;
   readonly y: number;
   readonly rot: boolean;
+  readonly trimmed: boolean;
+  readonly width: number;
+  readonly height: number;
+  readonly offsetTop: number;
+  readonly offsetLeft: number;
 };
 
 export type SpriteData = {
@@ -17,14 +30,15 @@ export type SpriteData = {
 
 export type TexturePackerOptions = {
   readonly spritesheetName: string;
-  readonly excludePaths: ReadonlyArray<string>;
-  readonly addSrcPath?: boolean;
+  readonly excludePaths?: ReadonlyArray<string>;
+  readonly subDir?: string;
 };
 
 export type SpriteDataOptions = {
-  readonly width: number;
-  readonly height: number;
+  readonly width?: number;
+  readonly height?: number;
   readonly scale?: number;
+  readonly category?: string;
 };
 
 export type OutputFile = {
@@ -38,3 +52,7 @@ export type OutputFileData = {
   readonly webpSprite: OutputFile;
   readonly webpConfig: OutputFile;
 };
+
+export type PreSourceTextureDataHook = (
+  sourceTextureData: SourceTextureData,
+) => SourceTextureData | Promise<SourceTextureData>;

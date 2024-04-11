@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/ksv90/texture-packer/compare/v0.1.0...v0.2.0) (2024-04-11)
+
+
+### Features
+
+* added binary for using configuration file ([6226282](https://github.com/ksv90/texture-packer/commit/6226282916053d187b0b820c5ff125b09500ce3c))
+
 ## [0.1.0](https://github.com/ksv90/texture-packer/compare/v0.0.4...v0.1.0) (2024-03-29)
 
 

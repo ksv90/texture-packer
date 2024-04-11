@@ -1,28 +1,11 @@
-import { readdir, readFile, stat } from 'node:fs/promises';
+import { readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 
 import type { SpritesheetData, SpritesheetFrameData } from 'pixi.js';
 import sharp, { Create, OverlayOptions, Sharp } from 'sharp';
 
 import { DEFAULT_SPRITE_BG_OPTIONS, DEFAULT_SPRITESHEETS_FORMAT, SPRITE_ALPHA_CHANNELS } from './constants';
-import { PreSourceTextureDataHook, TextureData } from './types';
-import { createSourceTextureData, createTextureData, resizeTexture, trimTexture } from './utils';
-
-export async function makeTextureData(
-  filePath: string,
-  scale = 1,
-  hook?: PreSourceTextureDataHook,
-): Promise<TextureData> {
-  let sourceTextureData = createSourceTextureData(filePath, await readFile(filePath));
-  if (hook) {
-    sourceTextureData = await hook(sourceTextureData);
-  }
-  if (scale !== 1) {
-    sourceTextureData = await resizeTexture(sourceTextureData, scale);
-  }
-  const textureData = createTextureData(sourceTextureData);
-  return await trimTexture(textureData);
-}
+import { TextureData } from './types';
 
 export function createOverlayOptions(textureDataList: readonly TextureData[]): OverlayOptions[] {
   return textureDataList.map(({ buffer, x, y }) => {

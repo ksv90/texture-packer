@@ -10,23 +10,30 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "assets-pack": "./bin/assets-pack.js"
+  },
   "files": [
-    "./dist"
+    "./dist",
+    "./bin",
+    "./schemas"
   ],
   "scripts": {
-    "build": "rollup --config rollup.config.ts --configPlugin typescript",
+    "build": "npm run create-config-schema && rollup --config rollup.config.ts --configPlugin typescript",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "echo test",
-    "texture-pack": "pnpm tsx ./examples/texture-pack.ts",
-    "prepublish": "pnpm build"
+    "prepublish": "pnpm build",
+    "create-config-schema": "tsx ./scripts/create-schema.ts"
   },
   "dependencies": {
     "buffer-image-size": "^0.6.4",
     "maxrects-packer": "^2.7.3",
-    "sharp": "^0.33.3"
+    "sharp": "^0.33.3",
+    "valibot": "^0.30.0"
   },
   "devDependencies": {
+    "@gcornut/valibot-json-schema": "^0.0.27",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "^20.11.30",
     "@typescript-eslint/eslint-plugin": "^7.4.0",

@@ -16,5 +16,5 @@
     "simple-import-sort/exports": "warn",
     "no-console": "warn"
   },
-  "ignorePatterns": ["node_modules", "dist"]
+  "ignorePatterns": ["node_modules", "dist", "bin"]
 }

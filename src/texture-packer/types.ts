@@ -1,13 +1,7 @@
-export type SourceTextureData = {
+export type TextureData = {
+  readonly filepath: string;
   readonly name: string;
   readonly type: string;
-  readonly buffer: globalThis.Buffer;
-  readonly width: number;
-  readonly height: number;
-};
-
-export type TextureData = {
-  readonly name: string;
   readonly buffer: globalThis.Buffer;
   readonly sourceWidth: number;
   readonly sourceHeight: number;
@@ -52,7 +46,3 @@ export type OutputFileData = {
   readonly webpSprite: OutputFile;
   readonly webpConfig: OutputFile;
 };
-
-export type PreSourceTextureDataHook = (
-  sourceTextureData: SourceTextureData,
-) => SourceTextureData | Promise<SourceTextureData>;

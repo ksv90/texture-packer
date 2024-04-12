@@ -5,10 +5,10 @@ export const TextureOptionsSchema = object({
 });
 
 export const OutputOptionsSchema = object({
-  format: union([literal('png'), literal('webp'), literal('avif')]),
+  format: union([literal('png'), literal('webp'), literal('avif'), literal('jpg')]),
   width: number(),
   height: number(),
-  subdirectory: optional(string()),
+  subDir: optional(string()),
   scale: optional(number()),
   suffix: optional(string()),
   name: optional(string()),
@@ -17,9 +17,9 @@ export const OutputOptionsSchema = object({
 export const ConfigOptionsSchema = object({
   sourceDir: string(),
   targetDir: string(),
-  pathList: array(string()),
+  sourceList: array(string()),
   subDir: optional(string()),
-  textures: optional(record(string(), TextureOptionsSchema)),
+  details: optional(record(string(), record(string(), TextureOptionsSchema))),
   allowRotation: optional(boolean()),
   output: array(OutputOptionsSchema),
 });

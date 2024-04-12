@@ -47,9 +47,9 @@ void (await (async function main() {
   };
 
   for (const config of configs) {
-    const textureOptions = Object.entries(config.textures ?? {}).map(([src, options]) => ({ ...options, src }));
     const rectPackerOptions = { allowRotation: !!config.allowRotation };
-    for (const sourceSrc of config.pathList) {
+    for (const sourceSrc of config.sourceList) {
+      const detailsOptions = config.details?.[sourceSrc];
       const sourceDirPath = path.resolve(cwd, config.sourceDir, sourceSrc, config.subDir ?? '');
       const items = await readdir(sourceDirPath);
       const textureDataList = await items.reduce<Promise<Array<TextureData>>>(async (acc, src) => {
@@ -64,9 +64,9 @@ void (await (async function main() {
         const { format, scale = 1, suffix = '', name = SPRITE_DEFAULT_NAME } = options;
         const maxRectsPacker = new MaxRectsPacker<TextureData>(options.width, options.height, 1, rectPackerOptions);
         const currentTextureData = textureDataList.map(async (textureData) => {
-          const options = textureOptions.find(({ src }) => textureData.filepath.endsWith(src));
+          const textureOptions = detailsOptions?.[textureData.name];
           let td = textureData;
-          td = await resizeTexture(td, scale * (options?.scale ?? 1));
+          td = await resizeTexture(td, scale * (textureOptions?.scale ?? 1));
           td = await trimTexture(td);
           return td;
         });
@@ -105,10 +105,14 @@ void (await (async function main() {
               spriteFile = spriteFile.avif();
               break;
             }
+            case 'jpg': {
+              spriteFile = spriteFile.jpeg();
+              break;
+            }
           }
           const configFile = createSpritesheetsData(spriteFileName, frames, { width, height, scale });
 
-          const targetPath = path.resolve(cwd, config.targetDir, sourceSrc, options.subdirectory ?? '');
+          const targetPath = path.resolve(cwd, config.targetDir, sourceSrc, options.subDir ?? '');
           await mkdir(targetPath, { recursive: true });
 
           await writeFile(path.join(targetPath, spriteFileName), await spriteFile.toBuffer());

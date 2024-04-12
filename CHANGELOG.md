@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/ksv90/texture-packer/compare/v0.2.0...v0.2.1) (2024-04-12)
+
+
+### Bug Fixes
+
+* release 0.2.1 ([5577331](https://github.com/ksv90/texture-packer/commit/55773312b13040a4f1beb81c7469fee0c31abcd7))
+
 ## [0.2.0](https://github.com/ksv90/texture-packer/compare/v0.1.0...v0.2.0) (2024-04-11)
 
 

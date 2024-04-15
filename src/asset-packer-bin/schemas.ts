@@ -12,6 +12,7 @@ export const OutputOptionsSchema = object({
   scale: optional(number()),
   suffix: optional(string()),
   name: optional(string()),
+  metaScale: optional(number()),
 });
 
 export const ConfigOptionsSchema = object({

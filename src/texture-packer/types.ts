@@ -18,7 +18,6 @@ export type TextureData = {
 export type SpriteData = {
   readonly width: number;
   readonly height: number;
-  readonly scale: number;
   readonly textureDataList: readonly TextureData[];
 };
 

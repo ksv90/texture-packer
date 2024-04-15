@@ -21,7 +21,7 @@ import {
   createSpritesheetsFrames,
 } from '../texture-packer/helpers';
 import { ConfigSchema } from './schemas';
-import { getJsonFile } from './utils';
+import { getJsonFile, makeTextureFormat } from './utils';
 
 const SPRITE_DEFAULT_NAME = 'sprite';
 
@@ -61,12 +61,12 @@ void (await (async function main() {
       }, Promise.resolve([]));
 
       for (const options of config.output) {
-        const { format, scale = 1, suffix = '', name = SPRITE_DEFAULT_NAME } = options;
+        const { format, metaScale: scale, suffix = '', name = SPRITE_DEFAULT_NAME, subDir = '' } = options;
         const maxRectsPacker = new MaxRectsPacker<TextureData>(options.width, options.height, 1, rectPackerOptions);
         const currentTextureData = textureDataList.map(async (textureData) => {
           const textureOptions = detailsOptions?.[textureData.name];
           let td = textureData;
-          td = await resizeTexture(td, scale * (textureOptions?.scale ?? 1));
+          td = await resizeTexture(td, (options.scale ?? 1) * (textureOptions?.scale ?? 1));
           td = await trimTexture(td);
           return td;
         });
@@ -78,47 +78,32 @@ void (await (async function main() {
             return await rotateTexture(textureData);
           });
           const textureDataList = await Promise.all(textureDataPromises);
-          return { width, height, textureDataList, scale } satisfies SpriteData;
+          return { width, height, textureDataList } satisfies SpriteData;
         });
         const spriteDataList = await Promise.all(spriteDataPromises);
+        const multi_packs: string[] = [];
+        const { length } = spriteDataList;
 
-        const series = spriteDataList.map(async (spriteData, index, { length }) => {
-          const { width, height, scale, textureDataList } = spriteData;
-
+        for (let index = length - 1; index >= 0; index -= 1) {
+          const { width, height, textureDataList } = spriteDataList[index];
           const key = index && length > 1 ? `${name}-${index}` : name;
           const spriteFileName = `${key}${suffix}.${format}`;
           const configFileName = `${key}${suffix}${Ext.json}`;
 
           const frames = createSpritesheetsFrames(textureDataList);
           const factory = createSpriteFactory(width, height).composite(createOverlayOptions(textureDataList));
-          let spriteFile = factory.clone();
-          switch (options.format) {
-            case 'png': {
-              spriteFile = spriteFile.png();
-              break;
-            }
-            case 'webp': {
-              spriteFile = spriteFile.webp();
-              break;
-            }
-            case 'avif': {
-              spriteFile = spriteFile.avif();
-              break;
-            }
-            case 'jpg': {
-              spriteFile = spriteFile.jpeg();
-              break;
-            }
-          }
+          const spriteFactory = makeTextureFormat(format, factory);
           const configFile = createSpritesheetsData(spriteFileName, frames, { width, height, scale });
 
-          const targetPath = path.resolve(cwd, config.targetDir, sourceSrc, options.subDir ?? '');
+          if (index) multi_packs.push(configFileName);
+          else if (multi_packs.length) configFile.meta.related_multi_packs = multi_packs.reverse();
+
+          const targetPath = path.resolve(cwd, config.targetDir, sourceSrc, subDir);
           await mkdir(targetPath, { recursive: true });
 
-          await writeFile(path.join(targetPath, spriteFileName), await spriteFile.toBuffer());
+          await writeFile(path.join(targetPath, spriteFileName), await spriteFactory.toBuffer());
           await writeFile(path.join(targetPath, configFileName), createBufferFromData(configFile));
-        });
-        await Promise.all(series);
+        }
       }
     }
   }

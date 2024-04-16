@@ -22,7 +22,7 @@ export function createSpriteFactory(
   height: number,
   options?: Omit<Create, 'width' | 'height' | 'channels'>,
 ): Sharp {
-  const background = options?.background ?? DEFAULT_SPRITE_BG_OPTIONS;
+  const background = options?.background || DEFAULT_SPRITE_BG_OPTIONS;  
   return sharp({ create: { width, height, background, channels: SPRITE_ALPHA_CHANNELS } });
 }
 

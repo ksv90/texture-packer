@@ -71,7 +71,7 @@ void (await (async function main() {
       animations.forEach((list) => list.sort());
 
       for (const options of config.output) {
-        const { format, metaScale: scale, suffix = '', name = SPRITE_DEFAULT_NAME, subDir = '' } = options;
+        const { format, metaScale: scale, suffix = '', name = SPRITE_DEFAULT_NAME, subDir = '', background = '' } = options;
         const maxRectsPacker = new MaxRectsPacker<TextureData>(options.width, options.height, 1, rectPackerOptions);
         const currentTextureData = textureDataList.map(async (textureData) => {
           const textureOptions = detailsOptions?.[textureData.name];
@@ -101,7 +101,7 @@ void (await (async function main() {
           const configFileName = `${key}${suffix}${Ext.json}`;
 
           const frames = createSpritesheetsFrames(textureDataList);
-          const factory = createSpriteFactory(width, height).composite(createOverlayOptions(textureDataList));
+          const factory = createSpriteFactory(width, height, {background }).composite(createOverlayOptions(textureDataList));
           const spriteFactory = makeTextureFormat(format, factory);
           const configFile = createSpritesheetsData(spriteFileName, frames, { width, height, scale });
 

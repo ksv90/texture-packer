@@ -13,6 +13,7 @@ export const OutputOptionsSchema = object({
   suffix: optional(string()),
   name: optional(string()),
   metaScale: optional(number()),
+  background: optional(string())
 });
 
 export const ConfigOptionsSchema = object({

@@ -51,14 +51,24 @@ void (await (async function main() {
     for (const sourceSrc of config.sourceList) {
       const detailsOptions = config.details?.[sourceSrc];
       const sourceDirPath = path.resolve(cwd, config.sourceDir, sourceSrc, config.subDir ?? '');
+      const animations = new Map<string, Array<string>>();
       const items = await readdir(sourceDirPath);
       const textureDataList = await items.reduce<Promise<Array<TextureData>>>(async (acc, src) => {
         const currentSrc = path.join(sourceDirPath, src);
         const textureData = await getTextureData(currentSrc);
         if (!textureData) return acc;
         const dataList = await acc;
+        const chunks = textureData.name.split('_')
+        if(chunks[1]) {
+          const animationName = chunks.slice(0, -1).join('_')
+          const animation = animations.get(animationName) ?? [];
+          animation.push(textureData.name);
+          animations.set(animationName, animation);
+        }
         return dataList.concat(textureData);
       }, Promise.resolve([]));
+
+      animations.forEach((list) => list.sort());
 
       for (const options of config.output) {
         const { format, metaScale: scale, suffix = '', name = SPRITE_DEFAULT_NAME, subDir = '' } = options;
@@ -81,7 +91,7 @@ void (await (async function main() {
           return { width, height, textureDataList } satisfies SpriteData;
         });
         const spriteDataList = await Promise.all(spriteDataPromises);
-        const multi_packs: string[] = [];
+        const multiPacks: string[] = [];
         const { length } = spriteDataList;
 
         for (let index = length - 1; index >= 0; index -= 1) {
@@ -95,8 +105,14 @@ void (await (async function main() {
           const spriteFactory = makeTextureFormat(format, factory);
           const configFile = createSpritesheetsData(spriteFileName, frames, { width, height, scale });
 
-          if (index) multi_packs.push(configFileName);
-          else if (multi_packs.length) configFile.meta.related_multi_packs = multi_packs.reverse();
+          if (index) multiPacks.push(configFileName);
+          else {
+            configFile.meta.related_multi_packs = multiPacks.reverse();
+            animations.forEach((animationList, animationName) => {
+              if (!configFile.animations) configFile.animations = {};
+              configFile.animations[animationName] = animationList;
+            });
+          }
 
           const targetPath = path.resolve(cwd, config.targetDir, sourceSrc, subDir);
           await mkdir(targetPath, { recursive: true });

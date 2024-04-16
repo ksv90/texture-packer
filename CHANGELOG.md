@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/ksv90/texture-packer/compare/v0.2.2...v0.2.3) (2024-04-16)
+
+
+### Bug Fixes
+
+* sprite animations added ([541672b](https://github.com/ksv90/texture-packer/commit/541672b78065fa8654e000136236cc25db7ad415))
+
 ## [0.2.2](https://github.com/ksv90/texture-packer/compare/v0.2.1...v0.2.2) (2024-04-15)
 
 

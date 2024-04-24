@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.4](https://github.com/ksv90/texture-packer/compare/v0.2.3...v0.2.4) (2024-04-24)
+
+
+### Bug Fixes
+
+* lite texture cache added ([ce3afac](https://github.com/ksv90/texture-packer/commit/ce3afac9b2fa7b6b069ae626124558c34f665b04))
+* sprite background added ([dc4fe69](https://github.com/ksv90/texture-packer/commit/dc4fe692efec651eaf742ebe1ae7ca9ef51f61a4))
+
 ## [0.2.3](https://github.com/ksv90/texture-packer/compare/v0.2.2...v0.2.3) (2024-04-16)
 
 

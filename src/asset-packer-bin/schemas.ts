@@ -13,11 +13,11 @@ export const OutputOptionsSchema = object({
   suffix: optional(string()),
   name: optional(string()),
   metaScale: optional(number()),
-  background: optional(string())
+  background: optional(string()),
 });
 
-export const ConfigOptionsSchema = object({
-  sourceDir: string(),
+export const SettingsOptionsSchema = object({
+  sourceDir: optional(string()),
   targetDir: string(),
   sourceList: array(string()),
   subDir: optional(string()),
@@ -27,5 +27,7 @@ export const ConfigOptionsSchema = object({
 });
 
 export const ConfigSchema = object({
-  configs: array(ConfigOptionsSchema),
+  settings: array(SettingsOptionsSchema),
 });
+
+export const AssetCacheSchema = record(string(), optional(array(string())));

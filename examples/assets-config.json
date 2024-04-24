@@ -1,0 +1,20 @@
+{
+  "$schema": "../schemas/config-schema.json",
+  "settings": [
+    {
+      "sourceDir": "examples",
+      "targetDir": "examples/public",
+      "sourceList": ["textures"],
+      "details": {
+        "textures": {
+          "t3.png": { "scale": 0.5 },
+          "t1.png": { "scale": 0.25 }
+        }
+      },
+      "output": [
+        { "format": "png", "width": 4096, "height": 4096, "suffix": "@1.0" },
+        { "format": "webp", "width": 2048, "height": 2048, "subDir": "webp" }
+      ]
+    }
+  ]
+}

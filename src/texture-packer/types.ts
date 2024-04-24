@@ -3,6 +3,7 @@ export type TextureData = {
   readonly name: string;
   readonly type: string;
   readonly buffer: globalThis.Buffer;
+  readonly hash: string;
   readonly sourceWidth: number;
   readonly sourceHeight: number;
   readonly x: number;

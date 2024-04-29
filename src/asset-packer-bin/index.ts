@@ -6,7 +6,7 @@ import { MaxRectsPacker } from 'maxrects-packer';
 
 import { Assets } from '../Assets';
 import {
-  createBufferFromData,
+  DEFAULT_SPRITESHEETS_NAME,
   Ext,
   resizeTexture,
   rotateTexture,
@@ -21,9 +21,8 @@ import {
   createSpritesheetsFrames,
 } from '../texture-packer/helpers';
 import { AssetCacheSchema, ConfigSchema } from './schemas';
-import { getJsonFile, makeTextureFormat } from './utils';
+import { createBufferFromData, getJsonFile, makeTextureFormat } from './utils';
 
-const SPRITE_DEFAULT_NAME = 'sprite';
 const ASSET_CACHE_NAME = '.assets-cache';
 
 void (await (async function main() {
@@ -91,10 +90,17 @@ void (await (async function main() {
       });
 
       animations.forEach((list) => list.sort());
-      assetCache[sourceDirSrc] = textureDataList.map(({ hash }) => hash);
+      assetCache[sourceDirSrc] = Array.from(
+        textureDataList.reduce<Set<string>>((set, { hash, name }) => {
+          if (set.has(hash)) {
+            process.stdin.write(`Хэш файла ${name} совпадает с уже добавленными в спрайт текстурами\n`);
+          }
+          return set.add(hash);
+        }, new Set()),
+      );
 
       for (const options of setting.output) {
-        const { metaScale, suffix = '', name = SPRITE_DEFAULT_NAME, subDir = '', background = '' } = options;
+        const { metaScale, suffix = '', name = DEFAULT_SPRITESHEETS_NAME, subDir = '', background = '' } = options;
         const maxRectsPacker = new MaxRectsPacker<TextureData>(options.width, options.height, 1, rectPackerOptions);
         const currentTextureData = textureDataList.map(async (textureData) => {
           const textureOptions = detailsOptions?.[textureData.name];
@@ -132,7 +138,6 @@ void (await (async function main() {
           const spriteHash = await assets.getFileHash(spriteBuffer);
           const spriteOptions = { width, height, scale: metaScale };
           const configFile = createSpritesheetsData(`${spriteFileName}?hash=${spriteHash}`, frames, spriteOptions);
-          const configFileBuffer = createBufferFromData(configFile);
 
           if (index) multiPacks.push(configFileName);
           else {
@@ -143,6 +148,7 @@ void (await (async function main() {
             });
           }
 
+          const configFileBuffer = createBufferFromData(configFile);
           const targetPath = path.resolve(cwd, setting.targetDir, sourceSrc, subDir);
           await mkdir(targetPath, { recursive: true });
 

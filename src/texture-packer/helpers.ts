@@ -1,6 +1,3 @@
-import { readdir, stat } from 'node:fs/promises';
-import path from 'node:path';
-
 import type { SpritesheetData, SpritesheetFrameData } from 'pixi.js';
 import sharp, { Create, OverlayOptions, Sharp } from 'sharp';
 
@@ -56,14 +53,4 @@ export function createSpritesheetsData(
       scale,
     },
   };
-}
-
-export async function getChildDirectories(parentDirectoryPath: string): Promise<Array<string>> {
-  const items = await readdir(parentDirectoryPath);
-  return items.reduce<Promise<Array<string>>>(async (directoriesPromise, src) => {
-    const currentSrc = path.join(parentDirectoryPath, src);
-    const stats = await stat(currentSrc);
-    const directories = await directoriesPromise;
-    return stats.isDirectory() ? directories.concat(src) : directories;
-  }, Promise.resolve([]));
 }

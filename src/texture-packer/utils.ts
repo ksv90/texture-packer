@@ -2,10 +2,6 @@ import sharp from 'sharp';
 
 import { TextureData } from './types';
 
-export function createBufferFromData(data: unknown): globalThis.Buffer {
-  return globalThis.Buffer.from(globalThis.JSON.stringify(data));
-}
-
 export async function resizeTexture(textureData: TextureData, scale = 1): Promise<TextureData> {
   const width = Math.round(textureData.width * scale);
   const height = Math.round(textureData.height * scale);

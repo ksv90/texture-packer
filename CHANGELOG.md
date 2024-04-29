@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.5](https://github.com/ksv90/texture-packer/compare/v0.2.4...v0.2.5) (2024-04-29)
+
+
+### Bug Fixes
+
+* hash feature fixed ([b810299](https://github.com/ksv90/texture-packer/commit/b81029934a8d7f54121eff8a6cf22cb3e7f24177))
+
 ## [0.2.4](https://github.com/ksv90/texture-packer/compare/v0.2.3...v0.2.4) (2024-04-24)
 
 

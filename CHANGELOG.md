@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.6](https://github.com/ksv90/texture-packer/compare/v0.2.5...v0.2.6) (2024-05-04)
+
+
+### Bug Fixes
+
+* texture size fixed ([4177a88](https://github.com/ksv90/texture-packer/commit/4177a8860b5b5eed8964dfae948cfc79557099c3))
+
 ## [0.2.5](https://github.com/ksv90/texture-packer/compare/v0.2.4...v0.2.5) (2024-04-29)
 
 

@@ -6,7 +6,7 @@ export async function resizeTexture(textureData: TextureData, scale = 1): Promis
   const width = Math.round(textureData.width * scale);
   const height = Math.round(textureData.height * scale);
   const buffer = await sharp(textureData.buffer).resize(width, height).toBuffer();
-  return { ...textureData, width, height, buffer } satisfies TextureData;
+  return { ...textureData, buffer, width, height, sourceWidth: width, sourceHeight: height } satisfies TextureData;
 }
 
 export async function trimTexture(textureData: TextureData): Promise<TextureData> {

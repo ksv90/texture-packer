@@ -6,6 +6,7 @@ import { MaxRectsPacker } from 'maxrects-packer';
 
 import { Assets } from '../Assets';
 import {
+  DEFAULT_ASSET_CACHE_NAME,
   DEFAULT_SPRITESHEETS_NAME,
   Ext,
   resizeTexture,
@@ -23,17 +24,16 @@ import {
 import { AssetCacheSchema, ConfigSchema } from './schemas';
 import { createBufferFromData, getJsonFile, makeTextureFormat } from './utils';
 
-const ASSET_CACHE_NAME = '.assets-cache';
-
 void (await (async function main() {
   const [, , configSrc] = process.argv;
   const cwd = process.cwd();
 
   if (!configSrc) throw new Error('не указан путь до файла конфигурации');
   const config = await getJsonFile(path.resolve(cwd, configSrc), ConfigSchema);
-  const assetCachePath = path.resolve(cwd, ASSET_CACHE_NAME);
+  const assetCachePath = path.resolve(cwd, config.cacheName ?? DEFAULT_ASSET_CACHE_NAME);
   const assetCache = await (async () => {
     try {
+      if (config.cache === false) return {};
       return await getJsonFile(assetCachePath, AssetCacheSchema);
     } catch {
       return {};
@@ -41,6 +41,7 @@ void (await (async function main() {
   })();
 
   const assets = new Assets(cwd);
+  const rectPackerOptions = { allowRotation: config.allowRotation == null ? true : !!config.allowRotation };
 
   const getTextureData = async (src: string): Promise<TextureData | null> => {
     try {
@@ -54,21 +55,24 @@ void (await (async function main() {
   };
 
   for (const setting of config.settings) {
-    const rectPackerOptions = { allowRotation: !!setting.allowRotation };
+    const { sourceDir = '', subDir = '' } = setting;
     for (const sourceSrc of setting.sourceList) {
       const detailsOptions = setting.details?.[sourceSrc];
+      const addTextures = setting.addTextures?.[sourceSrc] ?? [];
 
-      const sourceDirSrc = path.join(setting.sourceDir ?? '', sourceSrc, setting.subDir ?? '');
+      const sourceDirSrc = path.join(sourceDir, sourceSrc, subDir);
       const sourceDirPath = path.resolve(cwd, sourceDirSrc);
-
       const animations = new Map<string, Array<string>>();
+
       const items = await readdir(sourceDirPath);
+      const itemPaths = items
+        .map((src) => path.join(sourceDirPath, src))
+        .concat(addTextures.map((src) => path.resolve(cwd, sourceDir, src)));
 
       const directoryTextureHashes = assetCache[sourceDirSrc];
       let textureHashes = directoryTextureHashes ? new Set(directoryTextureHashes) : null;
-      const textureDataList = await items.reduce<Promise<Array<TextureData>>>(async (acc, src) => {
-        const currentSrc = path.join(sourceDirPath, src);
-        const textureData = await getTextureData(currentSrc);
+      const textureDataList = await itemPaths.reduce<Promise<Array<TextureData>>>(async (acc, src) => {
+        const textureData = await getTextureData(src);
         if (!textureData) return acc;
         const dataList = await acc;
         if (!textureHashes) return dataList.concat(textureData);
@@ -141,7 +145,7 @@ void (await (async function main() {
 
           if (index) multiPacks.push(configFileName);
           else {
-            configFile.meta.related_multi_packs = multiPacks.reverse();
+            if (multiPacks.length) configFile.meta.related_multi_packs = multiPacks.reverse();
             animations.forEach((animationList, animationName) => {
               if (!configFile.animations) configFile.animations = {};
               configFile.animations[animationName] = animationList;
@@ -154,7 +158,7 @@ void (await (async function main() {
 
           await writeFile(path.join(targetPath, spriteFileName), spriteBuffer);
           await writeFile(path.join(targetPath, configFileName), configFileBuffer);
-          await writeFile(assetCachePath, createBufferFromData(assetCache));
+          if (config.cache !== false) await writeFile(assetCachePath, createBufferFromData(assetCache));
         }
       }
     }

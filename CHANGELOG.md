@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.7](https://github.com/ksv90/texture-packer/compare/v0.2.6...v0.2.7) (2024-05-06)
+
+
+### Bug Fixes
+
+* implemented the ability to add textures from third-party directiories ([5a4df0b](https://github.com/ksv90/texture-packer/commit/5a4df0bd38313ae1f5d008ea8ac87c5fef4c166c))
+
 ## [0.2.6](https://github.com/ksv90/texture-packer/compare/v0.2.5...v0.2.6) (2024-05-04)
 
 

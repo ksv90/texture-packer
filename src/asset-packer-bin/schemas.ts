@@ -22,12 +22,15 @@ export const SettingsOptionsSchema = object({
   sourceList: array(string()),
   subDir: optional(string()),
   details: optional(record(string(), record(string(), TextureOptionsSchema))),
-  allowRotation: optional(boolean()),
   output: array(OutputOptionsSchema),
+  addTextures: optional(record(string(), array(string()))),
 });
 
 export const ConfigSchema = object({
   settings: array(SettingsOptionsSchema),
+  allowRotation: optional(boolean()),
+  cache: optional(boolean()),
+  cacheName: optional(string()),
 });
 
 export const AssetCacheSchema = record(string(), optional(array(string())));

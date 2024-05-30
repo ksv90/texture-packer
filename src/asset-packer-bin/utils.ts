@@ -28,6 +28,15 @@ export function makeTextureFormat(format: OutputOptions['format'], factory: Shar
   }
 }
 
-export function createBufferFromData(data: unknown): globalThis.Buffer {
-  return globalThis.Buffer.from(globalThis.JSON.stringify(data));
+export function createBufferFromData(data: unknown, format?: boolean): globalThis.Buffer {
+  const stringData = globalThis.JSON.stringify(data, null, format ? 4 : 0)
+  return globalThis.Buffer.from(stringData);
+}
+
+export function getProcessFlagValue(flagName: string, argsList: ReadonlyArray <string>): [presence: boolean, value?: string] {
+  const flagIndex = argsList.findIndex((argName) => argName === flagName)
+  if(flagIndex === -1) return [false]
+  const value = argsList[flagIndex + 1]
+  if(! value || value.startsWith('-')) return [true]
+  return [true, value]
 }

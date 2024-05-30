@@ -26,12 +26,12 @@ export class Assets {
     return buffer;
   }
 
-  public async getTextureData(filepath: string): Promise<TextureData> {
+  public async getTextureData(filepath: string, withoutExtension = false): Promise<TextureData> {
     const buffer = await this.readFile(filepath);
     const cachedTextureData = this.textureDataCache.get(buffer);
     if (cachedTextureData) return cachedTextureData;
     const { width, height, type } = textureSizeOf(buffer);
-    const name = path.basename(filepath);
+    const name = withoutExtension ? path.basename(filepath, path.extname(filepath)) : path.basename(filepath);
     const textureData = {
       filepath,
       name,

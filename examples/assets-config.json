@@ -5,6 +5,7 @@
       "sourceDir": "examples",
       "targetDir": "examples/public",
       "sourceList": ["textures"],
+      "withoutExtension": true,
       "details": {
         "textures": {
           "t3.png": { "scale": 0.5 },

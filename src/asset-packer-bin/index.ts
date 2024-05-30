@@ -22,14 +22,15 @@ import {
   createSpritesheetsFrames,
 } from '../texture-packer/helpers';
 import { AssetCacheSchema, ConfigSchema } from './schemas';
-import { createBufferFromData, getJsonFile, makeTextureFormat } from './utils';
+import { createBufferFromData, getJsonFile, getProcessFlagValue, makeTextureFormat } from './utils';
 
 void (await (async function main() {
-  const [, , configSrc] = process.argv;
   const cwd = process.cwd();
 
-  if (!configSrc) throw new Error('не указан путь до файла конфигурации');
-  const config = await getJsonFile(path.resolve(cwd, configSrc), ConfigSchema);
+  const [format] = getProcessFlagValue('--format', process.argv);
+  const [, configPath = './assets-config.json'] = getProcessFlagValue('--config', process.argv);
+
+  const config = await getJsonFile(path.resolve(cwd, configPath), ConfigSchema);
   const assetCachePath = path.resolve(cwd, config.cacheName ?? DEFAULT_ASSET_CACHE_NAME);
   const assetCache = await (async () => {
     try {
@@ -43,11 +44,11 @@ void (await (async function main() {
   const assets = new Assets(cwd);
   const rectPackerOptions = { allowRotation: config.allowRotation == null ? true : !!config.allowRotation };
 
-  const getTextureData = async (src: string): Promise<TextureData | null> => {
+  const getTextureData = async (src: string, withoutExtension?: boolean): Promise<TextureData | null> => {
     try {
       const stats = await stat(src);
       if (stats.isDirectory()) return null;
-      return await assets.getTextureData(src);
+      return await assets.getTextureData(src, withoutExtension);
     } catch {
       // TODO: добавить обработку ошибок в случае текстуры
       return null;
@@ -55,7 +56,7 @@ void (await (async function main() {
   };
 
   for (const setting of config.settings) {
-    const { sourceDir = '', subDir = '' } = setting;
+    const { sourceDir = '', subDir = '', withoutExtension } = setting;
     for (const sourceSrc of setting.sourceList) {
       const detailsOptions = setting.details?.[sourceSrc];
       const addTextures = setting.addTextures?.[sourceSrc] ?? [];
@@ -72,7 +73,7 @@ void (await (async function main() {
       const directoryTextureHashes = assetCache[sourceDirSrc];
       let textureHashes = directoryTextureHashes ? new Set(directoryTextureHashes) : null;
       const textureDataList = await itemPaths.reduce<Promise<Array<TextureData>>>(async (acc, src) => {
-        const textureData = await getTextureData(src);
+        const textureData = await getTextureData(src, withoutExtension);
         if (!textureData) return acc;
         const dataList = await acc;
         if (!textureHashes) return dataList.concat(textureData);
@@ -152,7 +153,7 @@ void (await (async function main() {
             });
           }
 
-          const configFileBuffer = createBufferFromData(configFile);
+          const configFileBuffer = createBufferFromData(configFile, format);
           const targetPath = path.resolve(cwd, setting.targetDir, sourceSrc, subDir);
           await mkdir(targetPath, { recursive: true });
 

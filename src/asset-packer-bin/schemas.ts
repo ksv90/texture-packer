@@ -24,6 +24,7 @@ export const SettingsOptionsSchema = object({
   details: optional(record(string(), record(string(), TextureOptionsSchema))),
   output: array(OutputOptionsSchema),
   addTextures: optional(record(string(), array(string()))),
+  withoutExtension: optional(boolean()),
 });
 
 export const ConfigSchema = object({

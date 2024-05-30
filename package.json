@@ -25,7 +25,7 @@
     "test": "echo test",
     "prepublish": "pnpm build",
     "create-config-schema": "tsx ./scripts/create-schema.ts",
-    "assets-pack": "tsx ./src/asset-packer-bin/index.ts ./examples/assets-config.json"
+    "assets-pack": "tsx ./src/asset-packer-bin/index.ts --config ./examples/assets-config.json"
   },
   "dependencies": {
     "buffer-image-size": "^0.6.4",
